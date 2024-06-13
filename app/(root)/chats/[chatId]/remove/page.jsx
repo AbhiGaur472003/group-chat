@@ -3,7 +3,7 @@
 import Loader from "@components/Loader";
 import { useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
-import { CheckCircle, RadioButtonUnchecked } from "@mui/icons-material";
+import { CheckCircle, Group, RadioButtonUnchecked } from "@mui/icons-material";
 import { useParams, useRouter } from "next/navigation";
 
 const Remove = () => {
@@ -21,6 +21,7 @@ const Remove = () => {
     try {
       const res = await fetch(`/api/chats/${chatId}`);
       const data = await res.json();
+
       setChat(data);
       setUnselected(data.members);
       setLoading(false);
@@ -30,13 +31,14 @@ const Remove = () => {
     }
   };
 
-  useEffect(() => {
+
+  useEffect( () => {
     if (chatId) {
       getChatDetails();
     }
   }, [chatId]);
 
-  /* SELECT CONTACT */
+  
   const [selectedContacts, setSelectedContacts] = useState([]);
   
 
@@ -63,13 +65,41 @@ const Remove = () => {
       ]);
     }
     
+    
   };
 
   const router = useRouter();
 
+  const updateUser = async()=>{
+
+    selectedContacts.map( async (contact,index)=>{
+      let group=contact.chats;
+      group=group.filter((item)=>item!=chatId);
+      const data = {chats: group};
+      let userId=contact._id;
+      // console.log(userId);
+      try{
+        const res2 = await fetch(`/api/users/${userId}/update`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(data),
+        });
+  
+      }catch(err){
+        console.log(err);
+      }
+    })
+  }
+
   const updateGroup = async () => {
+    
     setLoading(true);
+    await updateUser();
     const data={members: unselected};
+
+
     try {
       const res = await fetch(`/api/chats/${chatId}/update`, {
         method: "POST",
