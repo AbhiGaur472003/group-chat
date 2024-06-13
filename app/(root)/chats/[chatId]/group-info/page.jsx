@@ -54,6 +54,7 @@ const GroupInfo = () => {
   const router = useRouter();
 
   const updateGroupChat = async (data) => {
+
     setLoading(true);
     try {
       const res = await fetch(`/api/chats/${chatId}/update`, {
@@ -74,6 +75,10 @@ const GroupInfo = () => {
       console.log(error);
     }
   };
+
+  function handleRemoveClick(){
+    router.push(`/chats/${chatId}/remove`);
+  }
 
   return loading ? (
     <Loader />
@@ -111,14 +116,14 @@ const GroupInfo = () => {
           ))}
         </div>
 
-        <div className="flex flex-wrap gap-3">
-          {chat.createdBy === currentUser._id ? <p className="admin-contact" >Remove members</p> : <p></p>}
-        </div>
-
         <button className="btn" type="submit">
           Save Changes
         </button>
       </form>
+
+      <div className="flex flex-wrap gap-3">
+          {chat.createdBy === currentUser._id ? <button className="btn" onClick={handleRemoveClick}>Remove members</button> : <></>}
+        </div>
     </div>
   );
 };

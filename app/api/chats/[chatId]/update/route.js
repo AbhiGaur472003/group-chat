@@ -9,11 +9,11 @@ export const POST = async (req, { params }) => {
 
     const { chatId } = params
 
-    const { name, groupPhoto } = body
+    const { name, groupPhoto , members } = body
 
     const updatedGroupChat = await Chat.findByIdAndUpdate(
       chatId,
-      { name, groupPhoto },
+      { name, groupPhoto ,members},
       { new: true }
     )
 
