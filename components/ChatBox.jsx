@@ -21,7 +21,7 @@ const ChatBox = ({ chat, currentUser, currentChatId }) => {
       onClick={() => router.push(`/chats/${chat._id}`)}
     >
       <div className="chat-info">
-        {chat?.isGroup ? (
+        {chat? (
           <img
             src={chat?.groupPhoto || "/assets/group.png"}
             alt="group-photo"
@@ -36,7 +36,7 @@ const ChatBox = ({ chat, currentUser, currentChatId }) => {
         )}
 
         <div className="flex flex-col gap-1">
-          {chat?.isGroup ? (
+          {chat? (
             <p className="text-base-bold">{chat?.name}</p>
           ) : (
             <p className="text-base-bold">{otherMembers[0]?.username}</p>

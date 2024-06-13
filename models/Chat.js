@@ -9,6 +9,10 @@ const ChatSchema = new mongoose.Schema({
     type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Message'}],
     default: []
   },
+  createdBy: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User",
+  },
   name: {
     type: String,
     default: ''
@@ -20,10 +24,6 @@ const ChatSchema = new mongoose.Schema({
   createdAt: {
     type: Date,
     default: Date.now
-  },
-  createdBy: {
-    type: String,
-    default: ''
   },
   lastMessageAt: {
     type: Date,

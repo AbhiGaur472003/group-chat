@@ -9,19 +9,15 @@ export const POST = async (req) => {
 
     const body = await req.json();
 
-    const { currentUserId, members, isGroup, name, groupPhoto } = body;
+    const { currentUserId, members, name, groupPhoto } = body;
 
     // Define "query" to find the chat
-    const query = isGroup
-      ? { isGroup, name, groupPhoto, members: [currentUserId, ...members] }
-      : { members: { $all: [currentUserId, ...members], $size: 2 } };
+    const query = {  name, groupPhoto, members: [currentUserId, ...members] , createdBy: currentUserId};
 
     let chat = await Chat.findOne(query);
 
     if (!chat) {
-      chat = await new Chat(
-        isGroup ? query : { members: [currentUserId, ...members] }
-      );
+      chat = await new Chat(query);
 
       await chat.save();
 

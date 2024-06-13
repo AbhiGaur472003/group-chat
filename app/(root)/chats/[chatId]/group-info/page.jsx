@@ -2,10 +2,10 @@
 
 import Loader from "@components/Loader";
 import { GroupOutlined, PersonOutline } from "@mui/icons-material";
-import { CldUploadButton } from "next-cloudinary";
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
+import { useSession } from "next-auth/react";
 
 const GroupInfo = () => {
   const [loading, setLoading] = useState(true);
@@ -13,12 +13,16 @@ const GroupInfo = () => {
 
   const { chatId } = useParams();
 
+  const { data: session } = useSession();
+  const currentUser = session?.user;
+
   const getChatDetails = async () => {
     try {
       const res = await fetch(`/api/chats/${chatId}`);
       const data = await res.json();
       setChat(data);
       setLoading(false);
+      
       reset({
         name: data?.name,
         groupPhoto: data?.groupPhoto,
@@ -97,19 +101,18 @@ const GroupInfo = () => {
             alt="profile"
             className="w-40 h-40 rounded-full"
           />
-          <CldUploadButton
-            options={{ maxFiles: 1 }}
-            onUpload={uploadPhoto}
-            uploadPreset="upecg01j"
-          >
             <p className="text-body-bold">Upload new photo</p>
-          </CldUploadButton>
+          
         </div>
 
         <div className="flex flex-wrap gap-3">
           {chat?.members?.map((member, index) => (
-            <p className="selected-contact" key={index}>{member.username}</p>
+            {...chat.createdBy === member._id ? <p className="admin-contact" key={index}>{member.username}</p> : <p className="selected-contact" key={index}>{member.username}</p>}
           ))}
+        </div>
+
+        <div className="flex flex-wrap gap-3">
+          {chat.createdBy === currentUser._id ? <p className="admin-contact" >Remove members</p> : <p></p>}
         </div>
 
         <button className="btn" type="submit">

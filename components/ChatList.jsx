@@ -5,6 +5,7 @@ import { use, useEffect, useState } from "react";
 import ChatBox from "./ChatBox";
 import Loader from "./Loader";
 import { pusherClient } from "@lib/pusher";
+import { useRouter } from "next/navigation";
 
 const ChatList = ({ currentChatId }) => {
   const { data: sessions } = useSession();
@@ -25,7 +26,6 @@ const ChatList = ({ currentChatId }) => {
       );
       const data = await res.json();
       setChats(data);
-      console.log(res)
       setLoading(false);
     } catch (err) {
       console.log(err);
@@ -69,10 +69,18 @@ const ChatList = ({ currentChatId }) => {
     }
   }, [currentUser]);
 
+  const router = useRouter();
+    function handleClick(){
+        router.push('/contacts');
+    }
+
   return loading ? (
     <Loader />
   ) : (
     <div className="chat-list">
+      <button className="btn" onClick={handleClick}>
+            Create Group
+      </button>
       <input
         placeholder="Search chat..."
         className="input-search"
