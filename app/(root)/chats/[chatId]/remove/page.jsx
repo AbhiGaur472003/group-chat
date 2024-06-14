@@ -125,7 +125,7 @@ const Remove = () => {
   ) : (
     <div className="create-chat-container">
       <input
-        placeholder="Search contact..."
+        placeholder="Search member..."
         className="input-search"
         value={search}
         onChange={(e) => setSearch(e.target.value)}

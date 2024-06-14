@@ -202,3 +202,19 @@
 .bottombar {
   @apply bottom-0 sticky px-10 py-5 flex items-center justify-between sm:hidden;
 }
+
+
+.emoji {
+  cursor: pointer;
+  padding: 0.2rem;
+  font-size: 1.5rem;
+  pointer-events: all;
+}
+
+.emoji:hover{
+
+}
+
+.group-add-remove{
+  @apply flex gap-3 items-center cursor-pointer;
+}

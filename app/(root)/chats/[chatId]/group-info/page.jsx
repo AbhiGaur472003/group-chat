@@ -80,6 +80,10 @@ const GroupInfo = () => {
     router.push(`/chats/${chatId}/remove`);
   }
 
+  function handleAddClick(){
+    router.push(`/chats/${chatId}/adduser`);
+  }
+
   return loading ? (
     <Loader />
   ) : (
@@ -122,7 +126,12 @@ const GroupInfo = () => {
       </form>
 
       <div className="flex flex-wrap gap-3">
-          {chat.createdBy === currentUser._id ? <button className="btn" onClick={handleRemoveClick}>Remove members</button> : <></>}
+          {chat.createdBy === currentUser._id ? (
+            <div className="group-add-remove">
+              <button className="btn" onClick={handleRemoveClick}>Remove members</button>
+              <button className="btn" onClick={handleAddClick}>Add members</button>
+            </div>
+          ) : <></>}
         </div>
     </div>
   );
