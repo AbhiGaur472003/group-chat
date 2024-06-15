@@ -11,7 +11,7 @@ export const GET = async (req, {params}) => {
     
     const { messageId } = params;
 
-    const allUsers = await Message.findById(messageId)
+    const allMessage = await Message.findById(messageId)
     .populate({
       path: "chat",
       model: Chat,
@@ -30,7 +30,7 @@ export const GET = async (req, {params}) => {
     })
     .exec();
 
-    return new Response(JSON.stringify(allUsers), { status: 200 })
+    return new Response(JSON.stringify(allMessage), { status: 200 })
   } catch (err) {
     console.log(err)
     return new Response("Failed to get all users", { status: 500 })

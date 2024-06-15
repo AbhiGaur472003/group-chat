@@ -3,6 +3,7 @@ import InputEmoji from "react-input-emoji";
 import toast from "react-hot-toast";
 import { React, useState , useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { pusherClient } from "@lib/pusher";
 
 const MessageBox = ({ message, currentUser, chat }) => {
   const emojis = ['😀', '😂', '😍', '😢', '😡'];
@@ -13,6 +14,7 @@ const MessageBox = ({ message, currentUser, chat }) => {
   const [allReactions , setAllReactions] = useState([]);
   const [reactions , setReactions] = useState([]);
   const [refresh , setRefresh] =useState(false);
+  const [mssg , setMssg]=useState();
   
 
   const router = useRouter();
@@ -26,6 +28,7 @@ const MessageBox = ({ message, currentUser, chat }) => {
         },
       });
       const data = await res.json();
+      setMssg(data);
       setReactions(data.reactions);
       setRefresh(false);
       // console.log(data);
@@ -35,10 +38,31 @@ const MessageBox = ({ message, currentUser, chat }) => {
     }
   };
 
+  const Call =async(channel)=>{
+    await channel.bind('new-reaction', function(data) {
+      setMssg(prevMessages =>
+        prevMessages.map(msg =>
+          msg._id === data.messageId ? { ...msg, reactions: [...msg.reactions, data.emoji] } : msg
+        )
+      );
+    });
+  }
+
 
   useEffect(() => {
     if(message)getMssg();
-  }, [message,refresh]);
+
+    const channel = pusherClient.subscribe(`chat-${chat._id}`);
+
+    Call(channel);
+
+    setRefresh(true);
+
+    return () => {
+      channel.unsubscribe(`chat-${chat._id}`);
+      channel.unbind_all();
+    };
+  }, [message , refresh]);
 
 
   const handleEmojiClick = async (emoji) => {
@@ -47,7 +71,7 @@ const MessageBox = ({ message, currentUser, chat }) => {
     setSelectedEmoji(emoji);
     setHoveredText(false);
     // console.log(message);
-    const dataReaction = {createdBy : currentUser._id , name: currentUser.username , message: message._id , reactionMessage: emoji};
+    const dataReaction = {createdBy : currentUser._id , name: currentUser.username , message: message._id , reactionMessage: emoji , chatId: chat._id};
     // console.log(dataReaction);
 
     try{
@@ -62,21 +86,12 @@ const MessageBox = ({ message, currentUser, chat }) => {
 
       const resDataRec= await resRec.json();
 
-      const resMsg = await fetch(`/api/messages/${message._id}/update`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({reaction: resDataRec , chat: chat}),
-      });
-
-      if (resMsg.ok) {
+      if (resRec.ok) {
         console.log("Huo");
-        // router.push(`/chats/${chatId}`);
         setRefresh(true);
       }
 
-      if (resMsg.error || resDataRec.error) {
+      if (resDataRec.error) {
         toast.error("Something went wrong");
       }
     }catch(err){
