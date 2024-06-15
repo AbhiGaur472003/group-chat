@@ -1,28 +1,98 @@
 import { format } from "date-fns"
-import InputEmoji from "react-input-emoji"; 
+import InputEmoji from "react-input-emoji";
 import toast from "react-hot-toast";
-import {React , useState} from "react";
+import { React, useState , useEffect } from "react";
+import { useRouter } from "next/navigation";
 
-let listEmoji=['😀']
-
-const MessageBox = ({ message, currentUser }) => {
+const MessageBox = ({ message, currentUser, chat }) => {
   const emojis = ['😀', '😂', '😍', '😢', '😡'];
   const [hoveredText, setHoveredText] = useState(false);
   const [hoveredEmoji, setHoveredEmoji] = useState(false);
   const [selectedEmoji, setSelectedEmoji] = useState(null);
-
-
-  const handleEmojiClick =  (emoji) => {
-    setSelectedEmoji(emoji);
-    listEmoji.push(emoji);
-    setHoveredText(false);
-    console.log(emoji);
-  };
-
-  const handleMouseOver=()=>{
-
-  };
+  const [showList, setShowList] = useState(false);
+  const [allReactions , setAllReactions] = useState([]);
+  const [reactions , setReactions] = useState([]);
+  const [refresh , setRefresh] =useState(false);
   
+
+  const router = useRouter();
+
+  const getMssg = async()=>{
+    try {
+      const res = await fetch(`/api/messages/${message._id}`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+      const data = await res.json();
+      setReactions(data.reactions);
+      setRefresh(false);
+      // console.log(data);
+      
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+
+  useEffect(() => {
+    if(message)getMssg();
+  }, [message,refresh]);
+
+
+  const handleEmojiClick = async (emoji) => {
+    
+    // console.log(msgData);
+    setSelectedEmoji(emoji);
+    setHoveredText(false);
+    // console.log(message);
+    const dataReaction = {createdBy : currentUser._id , name: currentUser.username , message: message._id , reactionMessage: emoji};
+    // console.log(dataReaction);
+
+    try{
+
+      const resRec = await fetch(`/api/reaction`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(dataReaction),
+      });
+
+      const resDataRec= await resRec.json();
+
+      const resMsg = await fetch(`/api/messages/${message._id}/update`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({reaction: resDataRec , chat: chat}),
+      });
+
+      if (resMsg.ok) {
+        console.log("Huo");
+        // router.push(`/chats/${chatId}`);
+        setRefresh(true);
+      }
+
+      if (resMsg.error || resDataRec.error) {
+        toast.error("Something went wrong");
+      }
+    }catch(err){
+      console.log(err);
+    }
+  };
+
+  const handleMouseOver = () => {
+
+  };
+
+  const handlePP = () => {
+    console.log("Chl rha h");
+    setShowList(true);
+  }
+
   return message?.sender?._id !== currentUser._id ? (
     <div className="message-box">
       <img src={message?.sender?.profileImage || "/assets/person.jpg"} alt="profile photo" className="message-profilePhoto" />
@@ -32,7 +102,40 @@ const MessageBox = ({ message, currentUser }) => {
         </p>
 
         {message?.text ? (
-          <p className="message-text" hover={handleMouseOver}>{message?.text}</p>
+          <div>
+            <p className="message-text" onMouseEnter={() => setHoveredText(true)} onMouseLeave={() => setHoveredText(false)}>
+              {hoveredText && showList == false ? (
+                  <div >
+                    {emojis.map((emoji, index) => (
+                      <span className='emoji' key={index} onClick={() => handleEmojiClick(emoji)} >
+                        {emoji}
+                      </span>
+                    ))}
+                  </div>
+                ) :
+                  (
+                    <div>
+                      <p>{message?.text}</p>
+                    </div>
+                  )}
+            </p>
+              {reactions.length > 0 && hoveredText == false && showList == false ? (
+                <span className='lowemoji'  onClick={() => handlePP()} >
+                  😀
+                </span>
+              ) : (
+                <></>
+              )}
+              {showList? (
+              <div className="back" onClick={() => setShowList(false)}>
+                {reactions.map((emoji, index) => (
+                    <div key={index}>
+                      {emoji.name} {emoji.reactionMessage}
+                    </div>
+                  ))}
+              </div>
+            ) : <></>}
+          </div>
         ) : (
           <img src={message?.photo} alt="message" className="message-photo" />
         )}
@@ -47,42 +150,41 @@ const MessageBox = ({ message, currentUser }) => {
 
         {message?.text ? (
           <div className="message-text-sender">
-            
+
             <div onMouseEnter={() => setHoveredText(true)} onMouseLeave={() => setHoveredText(false)}>
-            {hoveredText ? (
-              <div >
-                {emojis.map((emoji, index) => (
-                  <span className='emoji' key={index} onClick={() => handleEmojiClick(emoji)} >
-                    {emoji}
-                  </span>
-                ))}
-              </div>
-            ):
-            (
-              <div>
-                <p>{message?.text}</p>
-              </div>
-            )}
-            </div>
-            {hoveredText ? (
-              <p></p>
-              ):(
-                <div onMouseEnter={() => setHoveredEmoji(true)} onMouseLeave={() => setHoveredEmoji(false)}>
-                  {hoveredEmoji ? (
-                      <div>
-                        {listEmoji.map((emoji, index) => (
-                        <span className='emoji' key={index}>
-                          {emoji}
-                        </span>
-                      ))}
-                      </div>
-                    ):(
-                      <p>{emojis[0]}</p>
-                    )
-                  }
+              {hoveredText && showList == false ? (
+                <div >
+                  {emojis.map((emoji, index) => (
+                    <span className='emoji' key={index} onClick={() => handleEmojiClick(emoji)} >
+                      {emoji}
+                    </span>
+                  ))}
                 </div>
-              )
-            }
+              ) :
+                (
+                  <div>
+                    <p>{message?.text}</p>
+                  </div>
+                )}
+            </div >
+            <div>
+              {reactions.length > 0 && hoveredText == false && showList == false ? (
+                <span className='lowemoji'  onClick={() => handlePP()} >
+                  😀
+                </span>
+              ) : (
+                <></>
+              )}
+            </div>
+            {showList? (
+              <div className="back" onClick={() => setShowList(false)}>
+                {reactions.map((emoji, index) => (
+                    <div key={index}>
+                      {emoji.name} {emoji.reactionMessage}
+                    </div>
+                  ))}
+              </div>
+            ) : <></>}
           </div>
         ) : (
           <img src={message?.photo} alt="message" className="message-photo" />

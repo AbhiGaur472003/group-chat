@@ -154,6 +154,7 @@ const ChatDetails = ({ chatId }) => {
               key={index}
               message={message}
               currentUser={currentUser}
+              chat={chat}
             />
           ))}
           <div ref={bottomRef} />

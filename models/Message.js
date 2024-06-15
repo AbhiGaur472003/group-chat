@@ -13,6 +13,10 @@ const MessageSchema = new mongoose.Schema({
     type: String,
     default: "",
   },
+  reactions: {
+    type: [{type: mongoose.Schema.Types.ObjectId,ref: "Reaction"}],
+    default: [],
+  },
   photo: {
     type: String,
     default: "",

@@ -1,6 +1,7 @@
 import { pusherServer } from "@lib/pusher";
 import Chat from "@models/Chat";
 import Message from "@models/Message";
+import Reaction from "@models/Reaction"
 import User from "@models/User";
 import { connectToDB } from "@mongodb";
 

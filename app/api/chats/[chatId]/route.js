@@ -1,6 +1,7 @@
 import Chat from "@models/Chat";
 import Message from "@models/Message";
 import User from "@models/User";
+import Reaction from "@models/Reaction"
 import { connectToDB } from "@mongodb";
 
 export const GET = async (req, { params }) => {

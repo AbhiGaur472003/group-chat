@@ -45,7 +45,7 @@ const Form = ({ type }) => {
         ...data,
         redirect: false,
       })
-      console.log(res);
+      // console.log(res);
       if (res.ok) {
         router.push("/chats");
       }
