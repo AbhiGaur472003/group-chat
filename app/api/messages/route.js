@@ -43,7 +43,12 @@ export const POST = async (req) => {
       .exec();
 
     /* Trigger a Pusher event for a specific chat about the new message */
-    await pusherServer.trigger(chatId, "new-message", newMessage)
+    try{
+      await pusherServer.trigger(chatId, "new-message", newMessage);
+    }catch(err){
+      console.log("Message trigger Error");
+    }
+    
 
     /* Triggers a Pusher event for each member of the chat about the chat update with the latest message */
     const lastMessage = updatedChat.messages[updatedChat.messages.length - 1];

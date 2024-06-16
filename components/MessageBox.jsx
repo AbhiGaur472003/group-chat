@@ -1,5 +1,4 @@
-import { format } from "date-fns"
-import InputEmoji from "react-input-emoji";
+import { format } from "date-fns";
 import toast from "react-hot-toast";
 import { React, useState , useEffect } from "react";
 import { useRouter } from "next/navigation";
@@ -8,12 +7,8 @@ import { pusherClient } from "@lib/pusher";
 const MessageBox = ({ message, currentUser, chat }) => {
   const emojis = ['😀', '😂', '😍', '😢', '😡'];
   const [hoveredText, setHoveredText] = useState(false);
-  const [hoveredEmoji, setHoveredEmoji] = useState(false);
-  const [selectedEmoji, setSelectedEmoji] = useState(null);
   const [showList, setShowList] = useState(false);
-  const [allReactions , setAllReactions] = useState([]);
   const [reactions , setReactions] = useState([]);
-  const [refresh , setRefresh] =useState(false);
   const [mssg , setMssg]=useState();
   
 
@@ -30,7 +25,6 @@ const MessageBox = ({ message, currentUser, chat }) => {
       const data = await res.json();
       setMssg(data);
       setReactions(data.reactions);
-      setRefresh(false);
       // console.log(data);
       
     } catch (error) {
@@ -51,18 +45,18 @@ const MessageBox = ({ message, currentUser, chat }) => {
 
   useEffect(() => {
     if(message)getMssg();
+  }, [message , mssg]);
 
+  useEffect(()=>{
     const channel = pusherClient.subscribe(`chat-${chat._id}`);
 
     Call(channel);
-
-    setRefresh(true);
 
     return () => {
       channel.unsubscribe(`chat-${chat._id}`);
       channel.unbind_all();
     };
-  }, [message , refresh]);
+  },[chat._id]);
 
 
   const handleEmojiClick = async (emoji) => {

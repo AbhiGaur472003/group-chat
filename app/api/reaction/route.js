@@ -50,17 +50,16 @@ export const POST = async (req, res) => {
     })
     .exec();
 
-    chat.members.forEach( async (user) => {
-      try{
-        pusherServer.trigger(`chat-${chatId}`, 'new-reaction', {
-          messageId,
-          emoji,
-          createdBy,
-        });
-      }catch(err){
-        console.log("Failed to trigger");
-      }
-    });
+    try{
+      await pusherServer.trigger(`chat-${chatId}`, 'new-reaction', {
+        messageId,
+        emoji,
+        createdBy,
+      });
+    }catch(err){
+      console.log("Galt aara hn");
+    }
+
 
 
     return new Response(JSON.stringify(newReaction), { status: 200 });
