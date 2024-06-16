@@ -62,7 +62,6 @@ const MessageBox = ({ message, currentUser, chat }) => {
   const handleEmojiClick = async (emoji) => {
     
     // console.log(msgData);
-    setSelectedEmoji(emoji);
     setHoveredText(false);
     // console.log(message);
     const dataReaction = {createdBy : currentUser._id , name: currentUser.username , message: message._id , reactionMessage: emoji , chatId: chat._id};
