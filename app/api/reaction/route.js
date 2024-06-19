@@ -33,28 +33,25 @@ export const POST = async (req, res) => {
 
     await newReaction.save();
 
-    await Message.findByIdAndUpdate(messageId, {
+    const UpdatedMessage=await Message.findByIdAndUpdate(messageId, {
       $push: { reactions: newReaction._id },
-    },{ new: true });
-
-    const chat = await Chat.findById(chatId)
+    },{ new: true })
     .populate({
-      path: "messages",
-      model: Message,
-      populate: { path: "sender seenBy", model: "User" },
-      populate: {path: "reactions" , model: Reaction},
+      path: "reactions",
+      model: Reaction,
     })
     .populate({
-      path: "members",
+      path: "sender",
       model: User,
     })
     .exec();
 
+    
+
     try{
-      await pusherServer.trigger(`chat-${chatId}`, 'new-reaction', {
+      await pusherServer.trigger(messageId, "new-reaction", {
         messageId,
-        emoji,
-        createdBy,
+        newReaction,
       });
     }catch(err){
       console.log("Galt aara hn");

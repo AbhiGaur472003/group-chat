@@ -28,6 +28,7 @@ const ChatDetails = ({ chatId }) => {
       });
       const data = await res.json();
       setChat(data);
+      
       setOtherMembers(
         data?.members?.filter((member) => member._id !== currentUser._id)
       );
@@ -55,7 +56,7 @@ const ChatDetails = ({ chatId }) => {
         }),
       });
 
-      console.log(res)
+      // console.log(res)
       if (res.ok) {
         setText("");
       }
@@ -86,6 +87,8 @@ const ChatDetails = ({ chatId }) => {
     pusherClient.subscribe(chatId);
 
     const handleMessage = async (newMessage) => {
+      // console.log("newMessage QQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQ");
+      // console.log(newMessage);
       setChat((prevChat) => {
         return {
           ...prevChat,
@@ -94,13 +97,21 @@ const ChatDetails = ({ chatId }) => {
       });
     };
 
+    
+
     pusherClient.bind("new-message", handleMessage);
+    
+
+   
 
     return () => {
       pusherClient.unsubscribe(chatId);
       pusherClient.unbind("new-message", handleMessage);
     };
   }, [chatId]);
+
+
+
 
 
   const bottomRef = useRef(null);
@@ -149,10 +160,11 @@ const ChatDetails = ({ chatId }) => {
         </div>
 
         <div className="chat-body">
-          {chat?.messages?.map((message, index) => (
+        {chat?.messages?.map((message, index) => (
             <MessageBox
               key={index}
               message={message}
+              reaction={message.reactions}
               currentUser={currentUser}
               chat={chat}
             />

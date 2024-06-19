@@ -1,62 +1,48 @@
-import { format } from "date-fns";
+'use client'
+
+import { parseISO, format } from "date-fns";
 import toast from "react-hot-toast";
 import { React, useState , useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { pusherClient } from "@lib/pusher";
 
-const MessageBox = ({ message, currentUser, chat }) => {
+const MessageBox = ({ message,reaction, currentUser, chat }) => {
   const emojis = ['😀', '😂', '😍', '😢', '😡'];
   const [hoveredText, setHoveredText] = useState(false);
   const [showList, setShowList] = useState(false);
-  const [reactions , setReactions] = useState([]);
-  const [mssg , setMssg]=useState();
+  const [reactions , setReactions] = useState(reaction);
   
 
   const router = useRouter();
 
-  const getMssg = async()=>{
-    try {
-      const res = await fetch(`/api/messages/${message._id}`, {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
-      const data = await res.json();
-      setMssg(data);
-      setReactions(data.reactions);
-      // console.log(data);
-      
-    } catch (error) {
-      console.log(error);
-    }
-  };
 
-  const Call =async(channel)=>{
-    await channel.bind('new-reaction', function(data) {
-      setMssg(prevMessages =>
-        prevMessages.map(msg =>
-          msg._id === data.messageId ? { ...msg, reactions: [...msg.reactions, data.emoji] } : msg
-        )
-      );
-    });
-  }
-
-
-  useEffect(() => {
-    if(message)getMssg();
-  }, [message , mssg]);
 
   useEffect(()=>{
-    const channel = pusherClient.subscribe(`chat-${chat._id}`);
+    pusherClient.subscribe(message._id);
 
-    Call(channel);
+    const handleReac = async(data)=>{
+      
+      if(data.messageId == message._id){
+        setReactions((prevRec) => {
+          return [...prevRec , data.newReaction];
+        });
+      }
+    }
+
+    pusherClient.bind("new-reaction", handleReac);
 
     return () => {
-      channel.unsubscribe(`chat-${chat._id}`);
-      channel.unbind_all();
+      pusherClient.unsubscribe(message._id);
+      pusherClient.unbind("new-reaction", handleReac);
     };
-  },[chat._id]);
+
+
+
+  },[message._id]);
+
+
+
+
 
 
   const handleEmojiClick = async (emoji) => {
@@ -81,7 +67,6 @@ const MessageBox = ({ message, currentUser, chat }) => {
 
       if (resRec.ok) {
         console.log("Huo");
-        setRefresh(true);
       }
 
       if (resDataRec.error) {
@@ -90,10 +75,6 @@ const MessageBox = ({ message, currentUser, chat }) => {
     }catch(err){
       console.log(err);
     }
-  };
-
-  const handleMouseOver = () => {
-
   };
 
   const handlePP = () => {
@@ -106,7 +87,7 @@ const MessageBox = ({ message, currentUser, chat }) => {
       <img src={message?.sender?.profileImage || "/assets/person.jpg"} alt="profile photo" className="message-profilePhoto" />
       <div className="message-info">
         <p className="text-small-bold">
-          {message?.sender?.username} &#160; &#183; &#160; {format(new Date(message?.createdAt), "p")}
+          {message?.sender?.username} &#160; &#183; &#160; {format(new Date(parseISO(message?.createdAt)), "p")}
         </p>
 
         {message?.text ? (

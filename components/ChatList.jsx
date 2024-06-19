@@ -26,6 +26,7 @@ const ChatList = ({ currentChatId }) => {
       );
       const data = await res.json();
       setChats(data);
+      // console.log(data);
       setLoading(false);
     } catch (err) {
       console.log(err);

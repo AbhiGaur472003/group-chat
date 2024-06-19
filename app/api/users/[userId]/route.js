@@ -18,10 +18,12 @@ export const GET = async (req, { params }) => {
       .populate({
         path: "messages",
         model: Message,
-        populate: {
-          path: "sender seenBy",
-          model: User,
-        },
+        populate: [
+          {
+            path: "sender seenBy",
+            model: User,
+          },
+        ],
       })
       .exec();
 
