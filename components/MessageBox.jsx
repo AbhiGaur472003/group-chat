@@ -5,15 +5,28 @@ import toast from "react-hot-toast";
 import { React, useState , useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { pusherClient } from "@lib/pusher";
+import EmojiPicker from "emoji-picker-react";
 
 const MessageBox = ({ message,reaction, currentUser, chat }) => {
   const emojis = ['😀', '😂', '😍', '😢', '😡'];
   const [hoveredText, setHoveredText] = useState(false);
   const [showList, setShowList] = useState(false);
   const [reactions , setReactions] = useState(reaction);
+  const [clickEmoji , setClickEmoji] = useState(false);
+  const [emojiCount,setEmojiCount]=useState({});
   
 
   const router = useRouter();
+
+  useEffect(()=>{
+    let dic={}
+    reactions.map((emoji, index) => (
+      dic[emoji.reactionMessage] ? dic[emoji.reactionMessage]+=1 : dic[emoji.reactionMessage]=1
+    ))
+    // console.log(dic);
+    
+    setEmojiCount(dic);
+  },[reactions]);
 
 
 
@@ -47,10 +60,12 @@ const MessageBox = ({ message,reaction, currentUser, chat }) => {
 
   const handleEmojiClick = async (emoji) => {
     
-    // console.log(msgData);
+    // console.log(emojiCount);
     setHoveredText(false);
+    setClickEmoji(false);
+    // console.log(emoji.emoji);
     // console.log(message);
-    const dataReaction = {createdBy : currentUser._id , name: currentUser.username , message: message._id , reactionMessage: emoji , chatId: chat._id};
+    const dataReaction = {createdBy : currentUser._id , name: currentUser.username , message: message._id , reactionMessage: emoji.emoji , chatId: chat._id};
     // console.log(dataReaction);
 
     try{
@@ -82,6 +97,11 @@ const MessageBox = ({ message,reaction, currentUser, chat }) => {
     setShowList(true);
   }
 
+  const handleMouseLeave=()=>{
+    setHoveredText(false);
+    setClickEmoji(false);
+  }
+
   return message?.sender?._id !== currentUser._id ? (
     <div className="message-box">
       <img src={message?.sender?.profileImage || "/assets/person.jpg"} alt="profile photo" className="message-profilePhoto" />
@@ -92,26 +112,29 @@ const MessageBox = ({ message,reaction, currentUser, chat }) => {
 
         {message?.text ? (
           <div>
-            <p className="message-text" onMouseEnter={() => setHoveredText(true)} onMouseLeave={() => setHoveredText(false)}>
+            <div className="message-message" onMouseEnter={() => setHoveredText(true)} onMouseLeave={() => handleMouseLeave()}>
               {hoveredText && showList == false ? (
                   <div >
-                    {emojis.map((emoji, index) => (
-                      <span className='emoji' key={index} onClick={() => handleEmojiClick(emoji)} >
-                        {emoji}
-                      </span>
-                    ))}
-                  </div>
+                  {clickEmoji ?  <EmojiPicker onEmojiClick={handleEmojiClick}></EmojiPicker> : 
+                        <div>
+                          <span className="message-text">{message?.text}</span>
+                          <span className='emoji' onClick={()=> setClickEmoji(true)} >☻</span>
+                        </div>
+                  }
+                </div>
                 ) :
                   (
                     <div>
-                      <p>{message?.text}</p>
+                      <p className="message-text">{message?.text}</p>
                     </div>
                   )}
-            </p>
+            </div>
               {reactions.length > 0 && hoveredText == false && showList == false ? (
-                <span className='lowemoji'  onClick={() => handlePP()} >
-                  😀
-                </span>
+                <div className='lowemoji'  onClick={() => handlePP()} >
+                  {Object.entries(emojiCount).map(entry => (
+                      <span >{entry[0]} {entry[1]}</span>
+                  ))}
+                </div>
               ) : (
                 <></>
               )}
@@ -138,29 +161,32 @@ const MessageBox = ({ message,reaction, currentUser, chat }) => {
         </p>
 
         {message?.text ? (
-          <div className="message-text-sender">
+          <div>
 
-            <div onMouseEnter={() => setHoveredText(true)} onMouseLeave={() => setHoveredText(false)}>
+            <div className="message-message"  onMouseEnter={() => setHoveredText(true)} onMouseLeave={() => handleMouseLeave()}>
               {hoveredText && showList == false ? (
                 <div >
-                  {emojis.map((emoji, index) => (
-                    <span className='emoji' key={index} onClick={() => handleEmojiClick(emoji)} >
-                      {emoji}
-                    </span>
-                  ))}
+                    {clickEmoji ?  <EmojiPicker onEmojiClick={handleEmojiClick}></EmojiPicker> : 
+                          <div>
+                            <span className='emoji' onClick={()=> setClickEmoji(true)} >☻</span>
+                            <span className="message-text-sender">{message?.text}</span>
+                          </div>
+                    }
                 </div>
               ) :
                 (
                   <div>
-                    <p>{message?.text}</p>
+                    <p className="message-text-sender">{message?.text}</p>
                   </div>
                 )}
             </div >
             <div>
-              {reactions.length > 0 && hoveredText == false && showList == false ? (
-                <span className='lowemoji'  onClick={() => handlePP()} >
-                  😀
-                </span>
+              {reactions.length > 0 && hoveredText == false  && showList == false ? (
+                <div className='lowemoji' onClick={() => handlePP()} >
+                  {Object.entries(emojiCount).map(entry => (
+                      <span >{entry[0]} {entry[1]}</span>
+                  ))}
+                </div>
               ) : (
                 <></>
               )}
