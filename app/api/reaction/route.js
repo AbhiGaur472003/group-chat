@@ -16,7 +16,7 @@ export const POST = async (req, res) => {
 
     const messageId=message;
 
-    const alreadyReacted = await Reaction.findOne({ createdBy , message });
+    const alreadyReacted = await Reaction.findOne({ createdBy , message ,reactionMessage });
 
     if (alreadyReacted) {
       return new Response("Reaction already exists", {
