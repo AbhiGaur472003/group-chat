@@ -2,42 +2,42 @@
 
 import { parseISO, format } from "date-fns";
 import toast from "react-hot-toast";
-import { React, useState , useEffect } from "react";
+import { React, useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { pusherClient } from "@lib/pusher";
 import EmojiPicker from "emoji-picker-react";
 
-const MessageBox = ({ message,reaction, currentUser, chat }) => {
-  const emojis = ['😀', '😂', '😍', '😢', '😡'];
+const MessageBox = ({ message, reaction, currentUser, chat }) => {
+
   const [hoveredText, setHoveredText] = useState(false);
   const [showList, setShowList] = useState(false);
-  const [reactions , setReactions] = useState(reaction);
-  const [clickEmoji , setClickEmoji] = useState(false);
-  const [emojiCount,setEmojiCount]=useState({});
-  
+  const [reactions, setReactions] = useState(reaction);
+  const [clickEmoji, setClickEmoji] = useState(false);
+  const [emojiCount, setEmojiCount] = useState({});
+
 
   const router = useRouter();
 
-  useEffect(()=>{
-    let dic={}
+  useEffect(() => {
+    let dic = {}
     reactions.map((emoji, index) => (
-      dic[emoji.reactionMessage] ? dic[emoji.reactionMessage]+=1 : dic[emoji.reactionMessage]=1
+      dic[emoji.reactionMessage] ? dic[emoji.reactionMessage] += 1 : dic[emoji.reactionMessage] = 1
     ))
     // console.log(dic);
-    
+
     setEmojiCount(dic);
-  },[reactions]);
+  }, [reactions]);
 
 
 
-  useEffect(()=>{
+  useEffect(() => {
     pusherClient.subscribe(message._id);
 
-    const handleReac = async(data)=>{
-      
-      if(data.messageId == message._id){
+    const handleReac = async (data) => {
+
+      if (data.messageId == message._id) {
         setReactions((prevRec) => {
-          return [...prevRec , data.newReaction];
+          return [...prevRec, data.newReaction];
         });
       }
     }
@@ -51,7 +51,7 @@ const MessageBox = ({ message,reaction, currentUser, chat }) => {
 
 
 
-  },[message._id]);
+  }, [message._id]);
 
 
 
@@ -59,16 +59,16 @@ const MessageBox = ({ message,reaction, currentUser, chat }) => {
 
 
   const handleEmojiClick = async (emoji) => {
-    
+
     // console.log(emojiCount);
     setHoveredText(false);
     setClickEmoji(false);
     // console.log(emoji.emoji);
     // console.log(message);
-    const dataReaction = {createdBy : currentUser._id , name: currentUser.username , message: message._id , reactionMessage: emoji.emoji , chatId: chat._id};
+    const dataReaction = { createdBy: currentUser._id, name: currentUser.username, message: message._id, reactionMessage: emoji.emoji, chatId: chat._id };
     // console.log(dataReaction);
 
-    try{
+    try {
 
       const resRec = await fetch(`/api/reaction`, {
         method: "POST",
@@ -78,7 +78,7 @@ const MessageBox = ({ message,reaction, currentUser, chat }) => {
         body: JSON.stringify(dataReaction),
       });
 
-      const resDataRec= await resRec.json();
+      const resDataRec = await resRec.json();
 
       if (resRec.ok) {
         console.log("Huo");
@@ -87,7 +87,7 @@ const MessageBox = ({ message,reaction, currentUser, chat }) => {
       if (resDataRec.error) {
         toast.error("Something went wrong");
       }
-    }catch(err){
+    } catch (err) {
       console.log(err);
     }
   };
@@ -97,7 +97,7 @@ const MessageBox = ({ message,reaction, currentUser, chat }) => {
     setShowList(true);
   }
 
-  const handleMouseLeave=()=>{
+  const handleMouseLeave = () => {
     setHoveredText(false);
     setClickEmoji(false);
   }
@@ -114,37 +114,38 @@ const MessageBox = ({ message,reaction, currentUser, chat }) => {
           <div>
             <div className="message-message" onMouseEnter={() => setHoveredText(true)} onMouseLeave={() => handleMouseLeave()}>
               {hoveredText && showList == false ? (
-                  <div >
-                  {clickEmoji ?  <EmojiPicker onEmojiClick={handleEmojiClick}></EmojiPicker> : 
-                        <div>
-                          <span className="message-text">{message?.text}</span>
-                          <span className='emoji' onClick={()=> setClickEmoji(true)} >☻</span>
-                        </div>
+                <div >
+                  {clickEmoji ? <EmojiPicker theme="dark" onEmojiClick={handleEmojiClick}></EmojiPicker> :
+                    <div>
+                      <span className="message-text">{message?.text}</span>
+                      <span className='emoji' onClick={() => setClickEmoji(true)} >☻</span>
+                    </div>
                   }
                 </div>
-                ) :
-                  (
-                    <div>
-                      <p className="message-text">{message?.text}</p>
-                    </div>
-                  )}
+              ) :
+                (
+                  <div>
+                    <p className="message-text">{message?.text}</p>
+                  </div>
+                )}
             </div>
-              {reactions.length > 0 && hoveredText == false && showList == false ? (
-                <div className='lowemoji'  onClick={() => handlePP()} >
-                  {Object.entries(emojiCount).map(entry => (
-                      <span >{entry[0]} {entry[1]}</span>
-                  ))}
-                </div>
-              ) : (
-                <></>
-              )}
-              {showList? (
-              <div className="back" onClick={() => setShowList(false)}>
+            {reactions.length > 0 && hoveredText == false && showList == false ? (
+              <div className='lowemoji' onClick={() => handlePP()} >
+                {Object.entries(emojiCount).map(entry => (
+                  <span className="show-reaction">{entry[0]} {entry[1]}</span>
+                ))}
+              </div>
+            ) : (
+              <></>
+            )}
+            {showList ? (
+              <div className="all-reaction" onClick={() => setShowList(false)}>
                 {reactions.map((emoji, index) => (
-                    <div key={index}>
-                      {emoji.name} {emoji.reactionMessage}
-                    </div>
-                  ))}
+                  <div className="user-reaction" key={index}>
+                    <span>{emoji.name}</span>
+                    <span>{emoji.reactionMessage}</span>
+                  </div>
+                ))}
               </div>
             ) : <></>}
           </div>
@@ -163,15 +164,15 @@ const MessageBox = ({ message,reaction, currentUser, chat }) => {
         {message?.text ? (
           <div>
 
-            <div className="message-message"  onMouseEnter={() => setHoveredText(true)} onMouseLeave={() => handleMouseLeave()}>
+            <div className="message-message" onMouseEnter={() => setHoveredText(true)} onMouseLeave={() => handleMouseLeave()}>
               {hoveredText && showList == false ? (
                 <div >
-                    {clickEmoji ?  <EmojiPicker onEmojiClick={handleEmojiClick}></EmojiPicker> : 
-                          <div>
-                            <span className='emoji' onClick={()=> setClickEmoji(true)} >☻</span>
-                            <span className="message-text-sender">{message?.text}</span>
-                          </div>
-                    }
+                  {clickEmoji ? <EmojiPicker theme="dark" onEmojiClick={handleEmojiClick}></EmojiPicker> :
+                    <div>
+                      <span className='emoji' onClick={() => setClickEmoji(true)} >☻</span>
+                      <span className="message-text-sender">{message?.text}</span>
+                    </div>
+                  }
                 </div>
               ) :
                 (
@@ -181,23 +182,24 @@ const MessageBox = ({ message,reaction, currentUser, chat }) => {
                 )}
             </div >
             <div>
-              {reactions.length > 0 && hoveredText == false  && showList == false ? (
+              {reactions.length > 0 && hoveredText == false && showList == false ? (
                 <div className='lowemoji' onClick={() => handlePP()} >
                   {Object.entries(emojiCount).map(entry => (
-                      <span >{entry[0]} {entry[1]}</span>
+                    <span className="show-reaction">{entry[0]} {entry[1]}</span>
                   ))}
                 </div>
               ) : (
                 <></>
               )}
             </div>
-            {showList? (
-              <div className="back" onClick={() => setShowList(false)}>
+            {showList ? (
+              <div className="all-reaction" onClick={() => setShowList(false)}>
                 {reactions.map((emoji, index) => (
-                    <div key={index}>
-                      {emoji.name} {emoji.reactionMessage}
-                    </div>
-                  ))}
+                  <div className="user-reaction" key={index}>
+                    <span>{emoji.name}</span>
+                    <span>{emoji.reactionMessage}</span>
+                  </div>
+                ))}
               </div>
             ) : <></>}
           </div>

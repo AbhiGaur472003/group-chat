@@ -26,7 +26,7 @@ const TopBar = () => {
         <Link
           href="/chats"
           className={`${
-            pathname === "/chats" ? "text-green-1" : ""
+            pathname === "/chats" ? "text-green-1" : "text-white"
           } text-heading4-bold`}
         >
           Chats
@@ -34,7 +34,7 @@ const TopBar = () => {
         <Link
           href="/contacts"
           className={`${
-            pathname === "/contacts" ? "text-green-1" : ""
+            pathname === "/contacts" ? "text-green-1" : "text-white"
           } text-heading4-bold`}
         >
           Contacts

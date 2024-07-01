@@ -107,7 +107,7 @@ const Contacts = () => {
 
         <div className="create-chat">
         <div className="flex flex-col gap-3">
-                <p className="text-body-bold">Group Chat Name</p>
+                <p className="text-body-bold text-white">Group Chat Name</p>
                 <input
                   placeholder="Enter group chat name..."
                   className="input-group-name"
@@ -118,7 +118,7 @@ const Contacts = () => {
               </div>
 
               <div className="flex flex-col gap-3">
-                <p className="text-body-bold">Members</p>
+                <p className="text-body-bold text-white">Members</p>
                 <div className="flex flex-wrap gap-3">
                   {selectedContacts.map((contact, index) => (
                     <p className="selected-contact" key={index}>

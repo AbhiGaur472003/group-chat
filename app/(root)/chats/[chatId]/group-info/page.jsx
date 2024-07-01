@@ -88,7 +88,7 @@ const GroupInfo = () => {
     <Loader />
   ) : (
     <div className="profile-page">
-      <h1 className="text-heading3-bold">Edit Group Info</h1>
+      <h1 className="text-heading3-bold text-white">Edit Group Info</h1>
 
       <form className="edit-profile" onSubmit={handleSubmit(updateGroupChat)}>
         <div className="input">
@@ -110,7 +110,7 @@ const GroupInfo = () => {
             alt="profile"
             className="w-40 h-40 rounded-full"
           />
-            <p className="text-body-bold">Upload new photo</p>
+            <p className="text-body-bold text-white">Upload new photo</p>
           
         </div>
 

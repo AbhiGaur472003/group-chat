@@ -14,7 +14,7 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
-      <body className={`${inter.className} bg-purple-1`}>
+      <body className={`${inter.className} bg-slate-900`}>
         <Provider>
           <ToasterContext />
           {children}
