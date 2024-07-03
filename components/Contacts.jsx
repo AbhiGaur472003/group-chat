@@ -106,27 +106,27 @@ const Contacts = () => {
         </div>
 
         <div className="create-chat">
-        <div className="flex flex-col gap-3">
-                <p className="text-body-bold text-white">Group Chat Name</p>
-                <input
-                  placeholder="Enter group chat name..."
-                  className="input-group-name"
-                  required
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                />
-              </div>
+          <div className="flex flex-col gap-3">
+            <p className="text-body-bold text-white">Group Chat Name</p>
+            <input
+              placeholder="Enter group chat name..."
+              className="input-group-name"
+              required
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+            />
+          </div>
 
-              <div className="flex flex-col gap-3">
-                <p className="text-body-bold text-white">Members</p>
-                <div className="flex flex-wrap gap-3">
-                  {selectedContacts.map((contact, index) => (
-                    <p className="selected-contact" key={index}>
-                      {contact.username}
-                    </p>
-                  ))}
-                </div>
-              </div>
+          <div className="flex flex-col gap-3">
+            <p className="text-body-bold text-white">Members</p>
+            <div className="flex flex-wrap gap-3">
+              {selectedContacts.map((contact, index) => (
+                <p className="selected-contact" key={index}>
+                  {contact.username}
+                </p>
+              ))}
+            </div>
+          </div>
           <button
             className="btn"
             onClick={createChat}

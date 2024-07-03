@@ -49,15 +49,15 @@ const Form = ({ type }) => {
       if (res.ok) {
         router.push("/chats");
       }
-      
-      
+
+
       if (res.error) {
         toast.error("Invalid email or password");
       }
     }
   };
 
-  
+
 
   return (
     <div className="auth">

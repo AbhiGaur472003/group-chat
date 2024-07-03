@@ -15,7 +15,7 @@ const ChatList = ({ currentChatId }) => {
   const [chats, setChats] = useState([]);
   const [search, setSearch] = useState("");
 
-  
+
 
   const getChats = async () => {
     try {
@@ -71,16 +71,16 @@ const ChatList = ({ currentChatId }) => {
   }, [currentUser]);
 
   const router = useRouter();
-    function handleClick(){
-        router.push('/contacts');
-    }
+  function handleClick() {
+    router.push('/contacts');
+  }
 
   return loading ? (
     <Loader />
   ) : (
     <div className="chat-list">
       <button className="btn" onClick={handleClick}>
-            Create Group
+        Create Group
       </button>
       <input
         placeholder="Search chat..."

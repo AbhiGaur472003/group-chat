@@ -28,7 +28,7 @@ const ChatDetails = ({ chatId }) => {
       });
       const data = await res.json();
       setChat(data);
-      
+
       setOtherMembers(
         data?.members?.filter((member) => member._id !== currentUser._id)
       );
@@ -97,12 +97,12 @@ const ChatDetails = ({ chatId }) => {
       });
     };
 
-    
+
 
     pusherClient.bind("new-message", handleMessage);
-    
 
-   
+
+
 
     return () => {
       pusherClient.unsubscribe(chatId);
@@ -128,7 +128,7 @@ const ChatDetails = ({ chatId }) => {
     <div className="pb-20">
       <div className="chat-details">
         <div className="chat-header">
-          {chat? (
+          {chat ? (
             <>
               <Link href={`/chats/${chatId}/group-info`}>
                 <img
@@ -160,7 +160,7 @@ const ChatDetails = ({ chatId }) => {
         </div>
 
         <div className="chat-body">
-        {chat?.messages?.map((message, index) => (
+          {chat?.messages?.map((message, index) => (
             <MessageBox
               key={index}
               message={message}
@@ -174,16 +174,16 @@ const ChatDetails = ({ chatId }) => {
 
         <div className="send-message">
           <div className="prepare-message">
-            
-              <AddPhotoAlternate
-                sx={{
-                  fontSize: "35px",
-                  color: "#737373",
-                  cursor: "pointer",
-                  "&:hover": { color: "red" },
-                }}
-              />
-           
+
+            <AddPhotoAlternate
+              sx={{
+                fontSize: "35px",
+                color: "#737373",
+                cursor: "pointer",
+                "&:hover": { color: "red" },
+              }}
+            />
+
 
             <input
               type="text"

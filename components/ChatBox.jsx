@@ -21,7 +21,7 @@ const ChatBox = ({ chat, currentUser, currentChatId }) => {
       onClick={() => router.push(`/chats/${chat._id}`)}
     >
       <div className="chat-info">
-        {chat? (
+        {chat ? (
           <img
             src={chat?.groupPhoto || "/assets/group.png"}
             alt="group-photo"
@@ -36,7 +36,7 @@ const ChatBox = ({ chat, currentUser, currentChatId }) => {
         )}
 
         <div className="flex flex-col gap-1">
-          {chat? (
+          {chat ? (
             <p className="text-base-bold">{chat?.name}</p>
           ) : (
             <p className="text-base-bold">{otherMembers[0]?.username}</p>
@@ -49,18 +49,16 @@ const ChatBox = ({ chat, currentUser, currentChatId }) => {
               <p className="text-small-medium text-white">You sent a photo</p>
             ) : (
               <p
-                className={`${
-                  seen ? "text-small-medium text-white" : "text-small-bold text-slate-500"
-                }`}
+                className={`${seen ? "text-small-medium text-white" : "text-small-bold text-slate-500"
+                  }`}
               >
                 Received a photo
               </p>
             )
           ) : (
             <p
-              className={`last-message ${
-                seen ? "text-small-medium text-slate-500" : "text-small-bold text-black"
-              }`}
+              className={`last-message ${seen ? "text-small-medium text-slate-500" : "text-small-bold text-black"
+                }`}
             >
               {lastMessage?.text}
             </p>
